@@ -66,9 +66,9 @@ if(SAPI_ENABLE_TESTS)
     filtering_test.cc
   )
   target_link_libraries(filtering_test PRIVATE
+    absl::flags
     absl::strings
     glog::glog
-    gflags::gflags
     sandbox2::network_proxy_filtering
     sandbox2::testing
     sapi::base

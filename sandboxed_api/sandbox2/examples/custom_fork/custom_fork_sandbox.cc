@@ -24,7 +24,7 @@
 #include <vector>
 
 #include <glog/logging.h>
-#include "sandboxed_api/util/flag.h"
+#include "absl/flags/parse.h"
 #include "absl/memory/memory.h"
 #include "sandboxed_api/sandbox2/comms.h"
 #include "sandboxed_api/sandbox2/executor.h"
@@ -106,7 +106,7 @@ static int SandboxIteration(sandbox2::ForkClient* fork_client, int32_t i) {
 }
 
 int main(int argc, char** argv) {
-  gflags::ParseCommandLineFlags(&argc, &argv, true);
+  absl::ParseCommandLine(argc, argv);
   google::InitGoogleLogging(argv[0]);
 
   // This test is incompatible with sanitizers.

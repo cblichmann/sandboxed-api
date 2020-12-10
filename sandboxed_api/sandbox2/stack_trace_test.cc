@@ -21,7 +21,7 @@
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "sandboxed_api/util/flag.h"
+#include "absl/flags/flag.h"
 #include "absl/memory/memory.h"
 #include "absl/strings/match.h"
 #include "absl/strings/str_cat.h"
@@ -37,7 +37,7 @@
 #include "sandboxed_api/sandbox2/util/temp_file.h"
 #include "sandboxed_api/util/status_matchers.h"
 
-ABSL_DECLARE_FLAG(bool, sandbox_libunwind_crash_handler);
+extern absl::Flag<bool> FLAGS_sandbox_libunwind_crash_handler;
 
 namespace sandbox2 {
 namespace {
@@ -53,8 +53,7 @@ using ::testing::Not;
 template <typename T>
 class TemporaryFlagOverride {
  public:
-  using Flag = T;
-  TemporaryFlagOverride(Flag* flag, T value)
+  TemporaryFlagOverride(absl::Flag<T>* flag, T value)
       : flag_(flag), original_value_(absl::GetFlag(*flag)) {
     absl::SetFlag(flag, value);
   }
@@ -62,7 +61,7 @@ class TemporaryFlagOverride {
   ~TemporaryFlagOverride() { absl::SetFlag(flag_, original_value_); }
 
  private:
-  Flag* flag_;
+  absl::Flag<T>* flag_;
   T original_value_;
 };
 

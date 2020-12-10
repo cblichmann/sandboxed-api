@@ -162,6 +162,8 @@ add_library(sapi_client STATIC
 add_library(sapi::client ALIAS sapi_client)
 target_link_libraries(sapi_client PRIVATE
   absl::core_headers
+  absl::flags
+  absl::flags_parse
   absl::strings
   glog::glog
   libffi::libffi
@@ -171,7 +173,6 @@ target_link_libraries(sapi_client PRIVATE
   sandbox2::logsink
   sapi::base
   sapi::call
-  sapi::flags
   sapi::lenval_core
   sapi::vars
 )

@@ -21,13 +21,14 @@ add_dependencies(sandbox2_zpipe_sandbox
   sandbox2::zpipe
 )
 target_link_libraries(sandbox2_zpipe_sandbox PRIVATE
+  absl::flags
+  absl::flags_parse
   absl::memory
   sandbox2::bpf_helper
   sandbox2::comms
   sandbox2::runfiles
   sandbox2::sandbox2
   sapi::base
-  sapi::flags
 )
 
 # sandboxed_api/sandbox2/examples/zlib:zpipe

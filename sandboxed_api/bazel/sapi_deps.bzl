@@ -59,16 +59,6 @@ def sapi_deps():
         ],
     )
 
-    # gflags
-    # TODO(cblichmann): Use Abseil flags once logging is in Abseil
-    maybe(
-        http_archive,
-        name = "com_github_gflags_gflags",
-        sha256 = "97312c67e5e0ad7fe02446ee124629ca7890727469b00c9a4bf45da2f9b80d32",  # 2019-11-13
-        strip_prefix = "gflags-addd749114fab4f24b7ea1e0f2f837584389e52c",
-        urls = ["https://github.com/gflags/gflags/archive/addd749114fab4f24b7ea1e0f2f837584389e52c.zip"],
-    )
-
     # Google logging
     # TODO(cblichmann): Remove dependency once logging is in Abseil
     maybe(

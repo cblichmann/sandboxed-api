@@ -11,7 +11,8 @@
 
 #include <cstring>
 
-#include "sandboxed_api/util/flag.h"
+#include "absl/flags/flag.h"
+#include "absl/flags/parse.h"
 #include "absl/status/status.h"
 #include "absl/status/statusor.h"
 #include "absl/strings/str_cat.h"
@@ -109,7 +110,7 @@ absl::StatusOr<int> ConnectToServer(int port) {
 }  // namespace
 
 int main(int argc, char** argv) {
-  gflags::ParseCommandLineFlags(&argc, &argv, false);
+  absl::ParseCommandLine(argc, argv);
 
   // Set-up the sandbox2::Client object, using a file descriptor (1023).
   sandbox2::Comms comms(sandbox2::Comms::kSandbox2ClientCommsFD);

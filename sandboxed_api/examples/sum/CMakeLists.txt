@@ -20,11 +20,12 @@ add_executable(sapi_main_sum
 )
 add_executable(sapi::main_sum ALIAS sapi_main_sum)
 target_link_libraries(sapi_main_sum PRIVATE
+  absl::flags
+  absl::flags_parse
   absl::memory
   absl::strings
   glog::glog
   sapi::base
-  sapi::flags
   sapi::sapi
   sapi::status
   sapi::sum_sapi

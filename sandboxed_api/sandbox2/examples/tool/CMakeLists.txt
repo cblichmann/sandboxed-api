@@ -18,11 +18,12 @@ add_executable(sandbox2_sandbox2tool
 )
 add_executable(sandbox2::sandbox2tool ALIAS sandbox2_sandbox2tool)
 target_link_libraries(sandbox2_sandbox2tool PRIVATE
+  absl::flags
+  absl::flags_parse
   absl::memory
   absl::strings
   sandbox2::bpf_helper
   sandbox2::sandbox2
   sandbox2::util
   sapi::base
-  sapi::flags
 )

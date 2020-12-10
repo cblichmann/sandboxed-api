@@ -25,7 +25,8 @@
 #include <glog/logging.h>
 #include "google/protobuf/descriptor.h"
 #include "google/protobuf/message.h"
-#include "sandboxed_api/util/flag.h"
+#include "absl/flags/flag.h"
+#include "absl/flags/parse.h"
 #include "absl/strings/str_cat.h"
 #include "sandboxed_api/call.h"
 #include "sandboxed_api/lenval_core.h"
@@ -426,9 +427,8 @@ void ServeRequest(sandbox2::Comms* comms) {
 }  // namespace sapi
 
 extern "C" ABSL_ATTRIBUTE_WEAK int main(int argc, char** argv) {
-  gflags::SetCommandLineOptionWithMode("userspace_coredumper", "false",
-                                       gflags::SET_FLAG_IF_DEFAULT);
-  gflags::ParseCommandLineFlags(&argc, &argv, true);
+  //absl::SetFlag(FLAGS_userspace_coredumper, false);
+  absl::ParseCommandLine(argc, argv);
   google::InitGoogleLogging(argv[0]);
 
   // Note regarding the FD usage here: Parent and child seem to make use of the

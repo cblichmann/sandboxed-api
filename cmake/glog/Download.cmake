@@ -34,7 +34,7 @@ endif()
 
 # Force gflags from subdirectory
 set(WITH_GFLAGS OFF CACHE BOOL "" FORCE)
-set(HAVE_LIB_GFLAGS 1)
+#set(HAVE_LIB_GFLAGS TRUE)
 
 set(WITH_UNWIND OFF CACHE BOOL "" FORCE)
 set(UNWIND_LIBRARY FALSE)

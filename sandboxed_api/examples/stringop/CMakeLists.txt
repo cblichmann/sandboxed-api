@@ -24,7 +24,6 @@ if(SAPI_ENABLE_TESTS)
     absl::strings
     absl::time
     glog::glog
-    sapi::flags
     sapi::sapi
     sapi::status
     sapi::stringop_sapi

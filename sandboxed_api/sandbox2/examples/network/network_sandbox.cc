@@ -28,7 +28,7 @@
 #include <string>
 
 #include <glog/logging.h>
-#include "sandboxed_api/util/flag.h"
+#include "absl/flags/parse.h"
 #include "sandboxed_api/sandbox2/comms.h"
 #include "sandboxed_api/sandbox2/executor.h"
 #include "sandboxed_api/sandbox2/ipc.h"
@@ -171,7 +171,7 @@ int main(int argc, char** argv) {
     return EXIT_SUCCESS;
   }
 
-  gflags::ParseCommandLineFlags(&argc, &argv, true);
+  absl::ParseCommandLine(argc, argv);
   google::InitGoogleLogging(argv[0]);
   int port = 8085;
   std::thread server_thread{Server,port};

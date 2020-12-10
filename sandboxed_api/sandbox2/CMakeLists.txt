@@ -71,7 +71,6 @@ target_link_libraries(sandbox2_syscall
           sandbox2::util
           sapi::base
   PUBLIC glog::glog
-         gflags::gflags
 )
 
 # sandboxed_api/sandbox2:result
@@ -161,6 +160,7 @@ add_library(sandbox2_policy STATIC
 add_library(sandbox2::policy ALIAS sandbox2_policy)
 target_link_libraries(sandbox2_policy PRIVATE
   absl::core_headers
+  absl::flags
   absl::optional
   sandbox2::bpf_helper
   sandbox2::bpfdisassembler
@@ -170,7 +170,6 @@ target_link_libraries(sandbox2_policy PRIVATE
   sandbox2::syscall
   sandbox2::violation_proto
   sapi::base
-  sapi::flags
 )
 
 # sandboxed_api/sandbox2:notify
@@ -230,7 +229,8 @@ add_library(sandbox2_global_forkserver STATIC
 )
 add_library(sandbox2::global_forkserver ALIAS sandbox2_global_forkserver)
 target_link_libraries(sandbox2_global_forkserver
-  PRIVATE absl::memory
+  PRIVATE absl::flags
+          absl::memory
           absl::strings
           glog::glog
           sandbox2::client
@@ -301,6 +301,7 @@ add_library(sandbox2_sandbox2 STATIC
 add_library(sandbox2::sandbox2 ALIAS sandbox2_sandbox2)
 target_link_libraries(sandbox2_sandbox2
   PRIVATE absl::core_headers
+          absl::flags
           absl::flat_hash_map
           absl::flat_hash_set
           absl::memory
@@ -337,8 +338,7 @@ target_link_libraries(sandbox2_sandbox2
           sandbox2::util
           sandbox2::violation_proto
           sapi::base
-  PUBLIC  sapi::flags
-          sapi::status
+  PUBLIC  sapi::status
           sandbox2::logsink
 )
 
@@ -705,7 +705,6 @@ if(SAPI_ENABLE_TESTS)
     absl::fixed_array
     absl::strings
     glog::glog
-    gflags::gflags
     sandbox2::comms
     sandbox2::comms_test_proto
     sapi::status_matchers
@@ -879,6 +878,7 @@ if(SAPI_ENABLE_TESTS)
     sandbox2::testcase_symbolize
   )
   target_link_libraries(stack_trace_test PRIVATE
+    absl::flags
     absl::memory
     absl::status
     absl::strings
@@ -889,7 +889,6 @@ if(SAPI_ENABLE_TESTS)
     sandbox2::temp_file
     sandbox2::testing
     sandbox2::util
-    sapi::flags
     sapi::status_matchers
     sapi::test_main
   )
@@ -906,12 +905,12 @@ if(SAPI_ENABLE_TESTS)
     sandbox2::testcase_ipc
   )
   target_link_libraries(ipc_test PRIVATE
+    absl::flags
     absl::memory
     sandbox2::bpf_helper
     sandbox2::comms
     sandbox2::sandbox2
     sandbox2::testing
-    sapi::flags
     sapi::status_matchers
     sapi::test_main
   )
@@ -940,6 +939,7 @@ if(SAPI_ENABLE_TESTS)
     sandbox2::testcase_print_fds
   )
   target_link_libraries(policybuilder_test PRIVATE
+    absl::flags
     absl::memory
     absl::strings
     glog::glog
@@ -947,7 +947,6 @@ if(SAPI_ENABLE_TESTS)
     sandbox2::comms
     sandbox2::sandbox2
     sandbox2::testing
-    sapi::flags
     sapi::status_matchers
     sapi::test_main
   )

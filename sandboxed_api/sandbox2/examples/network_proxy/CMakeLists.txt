@@ -22,13 +22,14 @@ add_dependencies(sandbox2_networkproxy_sandbox
 )
 target_link_libraries(sandbox2_networkproxy_sandbox PRIVATE
   glog::glog
+  absl::flags
+  absl::flags_parse
   sandbox2::bpf_helper
   sandbox2::comms
   sandbox2::fileops
   sandbox2::runfiles
   sandbox2::sandbox2
   sapi::base
-  sapi::flags
 )
 
 # sandboxed_api/sandbox2/examples/networkproxy:networkproxy_bin
@@ -37,16 +38,16 @@ add_executable(sandbox2_networkproxy_bin
 )
 add_executable(sandbox2::networkproxy_bin ALIAS sandbox2_networkproxy_bin)
 target_link_libraries(sandbox2_networkproxy_bin PRIVATE
+  glog::glog
+  absl::flags
+  absl::flags_parse
   absl::status
   absl::statusor
   absl::str_format
-  glog::glog
-  gflags::gflags
   sandbox2::client
   sandbox2::comms
   sandbox2::fileops
   sandbox2::network_proxy_client
   sapi::base
-  sapi::flags
   sapi::status
 )

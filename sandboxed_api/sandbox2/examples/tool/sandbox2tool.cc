@@ -30,7 +30,8 @@
 #include <vector>
 
 #include <glog/logging.h>
-#include "sandboxed_api/util/flag.h"
+#include "absl/flags/flag.h"
+#include "absl/flags/parse.h"
 #include "absl/memory/memory.h"
 #include "absl/strings/str_format.h"
 #include "absl/strings/str_split.h"
@@ -98,7 +99,7 @@ void OutputFD(int fd) {
 }  // namespace
 
 int main(int argc, char** argv) {
-  gflags::ParseCommandLineFlags(&argc, &argv, true);
+  absl::ParseCommandLine(argc, argv);
   google::InitGoogleLogging(argv[0]);
 
   if (argc < 2) {

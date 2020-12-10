@@ -19,7 +19,7 @@
 
 #include <glog/logging.h>
 #include "absl/base/macros.h"
-#include "sandboxed_api/util/flag.h"
+#include "absl/flags/parse.h"
 #include "absl/status/statusor.h"
 #include "sandboxed_api/examples/zlib/zlib-sapi.sapi.h"
 #include "sandboxed_api/examples/zlib/zlib-sapi_embed.h"
@@ -38,7 +38,7 @@
 #define Z_STREAM_END 1
 
 int main(int argc, char** argv) {
-  gflags::ParseCommandLineFlags(&argc, &argv, true);
+  absl::ParseCommandLine(argc, argv);
   google::InitGoogleLogging(argv[0]);
 
   sapi::Sandbox sandbox(sapi::zlib::zlib_sapi_embed_create());

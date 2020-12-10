@@ -12,12 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <unistd.h>
+
 #include <cstdlib>
 
 #include "absl/strings/str_format.h"
 #include "sandboxed_api/sandbox2/util/path.h"
 #include "sandboxed_api/sandbox2/util/runfiles.h"
-#include "sandboxed_api/util/flag.h"
 #include "sandboxed_api/util/raw_logging.h"
 #include "tools/cpp/runfiles/runfiles.h"
 
@@ -27,8 +28,13 @@ namespace sandbox2 {
 
 std::string GetDataDependencyFilePath(absl::string_view relative_path) {
   static Runfiles* runfiles = []() {
+    std::string link_name(PATH_MAX, '\0');
+    SAPI_RAW_PCHECK(
+        readlink("/proc/self/exe", &link_name[0], link_name.size()) != -1, "");
+    link_name.resize(link_name.find_first_of('\0'));
+
     std::string error;
-    auto* runfiles = Runfiles::Create(gflags::GetArgv0(), &error);
+    auto* runfiles = Runfiles::Create(link_name, &error);
     SAPI_RAW_CHECK(runfiles != nullptr, "%s", error);
 
     // Setup environment for child processes.

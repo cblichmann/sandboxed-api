@@ -17,7 +17,7 @@
 #include <sys/types.h>
 
 #include <glog/logging.h>
-#include "sandboxed_api/util/flag.h"
+#include "absl/flags/parse.h"
 #include "absl/memory/memory.h"
 #include "absl/status/status.h"
 #include "absl/strings/str_cat.h"
@@ -201,7 +201,7 @@ absl::Status test_addition(sapi::Sandbox* sandbox, int a, int b, int c) {
 }  // namespace
 
 int main(int argc, char** argv) {
-  gflags::ParseCommandLineFlags(&argc, &argv, true);
+  absl::ParseCommandLine(argc, argv);
   google::InitGoogleLogging(argv[0]);
 
   absl::Status status;

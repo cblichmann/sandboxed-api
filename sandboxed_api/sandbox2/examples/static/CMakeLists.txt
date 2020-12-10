@@ -21,12 +21,13 @@ add_dependencies(sandbox2_static_sandbox
   sandbox2::static_bin
 )
 target_link_libraries(sandbox2_static_sandbox PRIVATE
+  absl::flags
+  absl::flags_parse
   absl::memory
   sandbox2::bpf_helper
   sandbox2::runfiles
   sandbox2::sandbox2
   sapi::base
-  sapi::flags
 )
 
 # sandboxed_api/sandbox2/examples/static:static_bin

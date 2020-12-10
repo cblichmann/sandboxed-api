@@ -54,15 +54,6 @@ target_link_libraries(sapi_util_statusor PRIVATE
   sapi::base
 )
 
-# sandboxed_api/util:flag
-add_library(sapi_util_flags STATIC
-  flag.h
-)
-add_library(sapi::flags ALIAS sapi_util_flags)
-target_link_libraries(sapi_util_flags PUBLIC
-  gflags::gflags
-)
-
 # sandboxed_api/util:raw_logging
 add_library(sapi_util_raw_logging STATIC
   raw_logging.cc

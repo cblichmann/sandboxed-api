@@ -72,7 +72,7 @@ add_executable(sandbox2::testcase_ipc ALIAS ipc)
 target_link_libraries(ipc PRIVATE
   absl::strings
   -Wl,--whole-archive
-  gflags::gflags
+  absl::flags
   -Wl,--no-whole-archive
   glog::glog
   sandbox2::client
@@ -139,7 +139,7 @@ set_target_properties(pidcomms PROPERTIES
 )
 target_link_libraries(pidcomms PRIVATE
   -Wl,--whole-archive
-  gflags::gflags
+  absl::flags
   -Wl,--no-whole-archive
   glog::glog
   sandbox2::client
@@ -242,7 +242,7 @@ set_target_properties(tsync PROPERTIES
 )
 target_link_libraries(tsync PRIVATE
   -Wl,--whole-archive
-  gflags::gflags
+  absl::flags
   -Wl,--no-whole-archive
   glog::glog
   sandbox2::client

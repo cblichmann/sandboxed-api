@@ -28,7 +28,7 @@
 #include <vector>
 
 #include <glog/logging.h>
-#include "sandboxed_api/util/flag.h"
+#include "absl/flags/flag.h"
 #include "absl/memory/memory.h"
 #include "absl/strings/ascii.h"
 #include "absl/strings/str_cat.h"
@@ -99,9 +99,9 @@ std::string AbslUnparseFlag(GlobalForkserverStartModeSet in) {
 
 }  // namespace sandbox2
 
-ABSL_FLAG(string, sandbox2_forkserver_start_mode, "ondemand",
+ABSL_FLAG(std::string, sandbox2_forkserver_start_mode, "ondemand",
           "When Sandbox2 Forkserver process should be started");
-DEFINE_validator(sandbox2_forkserver_start_mode, &sandbox2::ValidateStartMode);
+//DEFINE_validator(sandbox2_forkserver_start_mode, &sandbox2::ValidateStartMode);
 
 namespace sandbox2 {
 

@@ -44,9 +44,6 @@ include(SapiBuildDefs)
 # Allow the header generator to auto-configure include paths
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-# Allow the header generator to auto-configure include paths
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-
 if (SAPI_FORCE_COLOR_OUTPUT)
   if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")  # GCC
     add_compile_options(-fdiagnostics-color=always)

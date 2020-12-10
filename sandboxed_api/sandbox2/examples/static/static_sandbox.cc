@@ -28,7 +28,7 @@
 #include <vector>
 
 #include <glog/logging.h>
-#include "sandboxed_api/util/flag.h"
+#include "absl/flags/parse.h"
 #include "absl/memory/memory.h"
 #include "sandboxed_api/sandbox2/executor.h"
 #include "sandboxed_api/sandbox2/ipc.h"
@@ -106,7 +106,7 @@ int main(int argc, char** argv) {
     defined(THREAD_SANITIZER)
   return EXIT_SUCCESS;
 #endif
-  gflags::ParseCommandLineFlags(&argc, &argv, true);
+  absl::ParseCommandLine(argc, argv);
   google::InitGoogleLogging(argv[0]);
 
   const std::string path = sandbox2::GetInternalDataDependencyFilePath(

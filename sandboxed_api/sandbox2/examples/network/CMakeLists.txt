@@ -22,13 +22,14 @@ add_dependencies(sandbox2_network_sandbox
 )
 target_link_libraries(sandbox2_network_sandbox PRIVATE
   glog::glog
+  absl::flags
+  absl::flags_parse
   sandbox2::bpf_helper
   sandbox2::comms
   sandbox2::fileops
   sandbox2::runfiles
   sandbox2::sandbox2
   sapi::base
-  sapi::flags
 )
 
 # sandboxed_api/sandbox2/examples/network_bin:network_bin
@@ -39,7 +40,7 @@ add_executable(sandbox2::network_bin ALIAS network_bin)
 target_link_libraries(network_bin PRIVATE
   absl::str_format
   glog::glog
-  gflags::gflags
+  absl::flags
   sandbox2::client
   sandbox2::comms
   sandbox2::fileops

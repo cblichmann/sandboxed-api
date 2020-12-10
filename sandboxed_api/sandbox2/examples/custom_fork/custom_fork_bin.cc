@@ -20,7 +20,8 @@
 
 #include <cstdint>
 
-#include "sandboxed_api/util/flag.h"
+#include "absl/flags/flag.h"
+#include "absl/flags/parse.h"
 #include "sandboxed_api/sandbox2/comms.h"
 #include "sandboxed_api/sandbox2/forkingclient.h"
 #include "sandboxed_api/util/raw_logging.h"
@@ -39,9 +40,8 @@ static int SandboxeeFunction(sandbox2::Comms* comms) {
 
 int main(int argc, char** argv) {
   // Writing to stderr limits the number of invoked syscalls.
-  gflags::SetCommandLineOptionWithMode("logtostderr", "true",
-                                       gflags::SET_FLAG_IF_DEFAULT);
-  gflags::ParseCommandLineFlags(&argc, &argv, false);
+  //absl::SetFlag(FLAGS_logtostderr, true);
+  absl::ParseCommandLine(argc, argv);
 
   // Instantiate Comms channel with the parent Executor
   sandbox2::Comms comms(sandbox2::Comms::kSandbox2ClientCommsFD);
