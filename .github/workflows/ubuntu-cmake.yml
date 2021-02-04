@@ -15,23 +15,33 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: Cache dependencies
+      uses: actions/cache@v2
+      env:
+        cache-name: cache-deps
+      with:
+        path: ${{ runner.workspace }}/build/_deps
+        key: ${{ matrix.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/*.cmake') }}
+        restore-keys: |
+          ${{ matrix.os }}-build-${{ env.cache-name }}-
+
     - name: Install ninja-build tool
       uses: seanmiddleditch/gha-setup-ninja@v3
 
     - name: Create Build Environment
       run: |
         pip3 install absl-py clang
-        cmake -E make_directory ${{runner.workspace}}/build
+        cmake -E make_directory ${{ runner.workspace }}/build
 
     - name: Configure CMake
-      working-directory: ${{runner.workspace}}/build
+      working-directory: ${{ runner.workspace }}/build
       run: cmake $GITHUB_WORKSPACE -G Ninja -DCMAKE_BUILD_TYPE=$BUILD_TYPE
 
     - name: Build
-      working-directory: ${{runner.workspace}}/build
+      working-directory: ${{ runner.workspace }}/build
       run: cmake --build . --config $BUILD_TYPE
 
     # TODO(cblichmann): Before enabling this, make sure all OSS tests pass
     #- name: Test
-    #  working-directory: ${{runner.workspace}}/build
+    #  working-directory: ${{ runner.workspace }}/build
     #  run: ctest -C $BUILD_TYPE
