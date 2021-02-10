@@ -12,6 +12,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.11")
+  include(FetchContent)
+
+  set(SAPI_HAVE_FETCHCONTENT TRUE)
+  if(CMAKE_VERSION VERSION_LESS "3.14")
+    macro(FetchContent_MakeAvailable name)
+      FetchContent_GetProperties(${name})
+      if(NOT ${name}_POPULATED)
+        FetchContent_Populate(${name})
+        add_subdirectory(${${name}_SOURCE_DIR} ${${name}_BINARY_DIR})
+      endif()
+    endmacro()
+  endif()
+else()
+  set(SAPI_HAVE_FETCHCONTENT FALSE)
+endif()
+
+# Similar to FETCHCONTENT_BASE_DIR
+set(SAPI_SUPERBUILD_BASE_DIR "${CMAKE_BINARY_DIR}/_deps" CACHE INTERNAL "")
+
 # Creates an alias for SOURCE, called DESTINATION.
 #
 # On platforms that support them, this rule will effectively create a symlink.

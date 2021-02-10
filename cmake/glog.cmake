@@ -17,15 +17,23 @@ if(POLICY CMP0079)
   cmake_policy(SET CMP0079 NEW)
 endif()
 
-set(workdir "${CMAKE_BINARY_DIR}/_deps/glog-populate")
-
 set(SAPI_GLOG_GIT_REPOSITORY https://github.com/google/glog.git CACHE STRING "")
 set(SAPI_GLOG_GIT_TAG 3ba8976592274bc1f907c402ce22558011d6fc5e
                       CACHE STRING "") # 2020-02-16
-set(SAPI_GLOG_SOURCE_DIR "${CMAKE_BINARY_DIR}/_deps/glog-src" CACHE STRING "")
-set(SAPI_GLOG_BINARY_DIR "${CMAKE_BINARY_DIR}/_deps/glog-build" CACHE STRING "")
 
-file(WRITE "${workdir}/CMakeLists.txt" "\
+if(SAPI_GLOG_PROVIDER STREQUAL "fetch")
+  FetchContent_Declare(glog
+    GIT_REPOSITORY "${SAPI_GLOG_GIT_REPOSITORY}"
+    GIT_TAG        "${SAPI_GLOG_GIT_TAG}"
+  )
+elseif(SAPI_GLOG_PROVIDER STREQUAL "superbuild")
+  set(SAPI_GLOG_POPULATE_DIR
+    "${SAPI_SUPERBUILD_BASE_DIR}/glog-populate" CACHE STRING "")
+  set(SAPI_GLOG_SOURCE_DIR
+    "${SAPI_SUPERBUILD_BASE_DIR}/glog-src" CACHE STRING "")
+  set(SAPI_GLOG_BINARY_DIR
+    "${SAPI_SUPERBUILD_BASE_DIR}/glog-build" CACHE STRING "")
+  file(WRITE "${SAPI_GLOG_POPULATE_DIR}/CMakeLists.txt" "\
 cmake_minimum_required(VERSION ${CMAKE_VERSION})
 project(glog-populate NONE)
 include(ExternalProject)
@@ -40,53 +48,65 @@ ExternalProject_Add(glog
   TEST_COMMAND      \"\"
 )
 ")
-
-execute_process(COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" .
-                RESULT_VARIABLE error
-                WORKING_DIRECTORY "${workdir}")
-if(error)
-  message(FATAL_ERROR "CMake step for ${PROJECT_NAME} failed: ${error}")
+  execute_process(COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" .
+                  RESULT_VARIABLE error
+                  WORKING_DIRECTORY "${SAPI_GLOG_POPULATE_DIR}")
+  if(error)
+    message(FATAL_ERROR "CMake step for ${PROJECT_NAME} failed: ${error}")
+  endif()
+  execute_process(COMMAND "${CMAKE_COMMAND}" --build .
+                  RESULT_VARIABLE error
+                  WORKING_DIRECTORY "${SAPI_GLOG_POPULATE_DIR}")
+  if(error)
+    message(FATAL_ERROR "Build step for ${PROJECT_NAME} failed: ${error}")
+  endif()
 endif()
 
-execute_process(COMMAND "${CMAKE_COMMAND}" --build .
-                RESULT_VARIABLE error
-                WORKING_DIRECTORY "${workdir}")
-if(error)
-  message(FATAL_ERROR "Build step for ${PROJECT_NAME} failed: ${error}")
+if(SAPI_GLOG_PROVIDER STREQUAL "package")
+  find_package(glog REQUIRED CONFIG)
+else()
+  set(_sapi_saved_BUILD_TESTING ${BUILD_TESTING})
+
+  # Force gflags from subdirectory
+  set(WITH_GFLAGS FALSE CACHE BOOL "" FORCE)
+  set(HAVE_LIB_GFLAGS TRUE CACHE STRING "" FORCE)
+
+  set(WITH_UNWIND FALSE CACHE BOOL "" FORCE)
+  set(UNWIND_LIBRARY FALSE)
+  set(HAVE_PWD_H FALSE)
+
+  set(WITH_PKGCONFIG TRUE CACHE BOOL "" FORCE)
+
+  set(BUILD_TESTING FALSE)
+  set(BUILD_SHARED_LIBS ${SAPI_ENABLE_SHARED_LIBS})
+
+  if(SAPI_GLOG_PROVIDER STREQUAL "fetch")
+    FetchContent_MakeAvailable(glog)
+    set(SAPI_GLOG_BINARY_DIR "${glog_BINARY_DIR}")
+
+    set(SAPI_GFLAGS_BINARY_DIR "${gflags_BINARY_DIR}")
+  else()
+    add_subdirectory("${SAPI_GLOG_SOURCE_DIR}"
+                     "${SAPI_GLOG_BINARY_DIR}" EXCLUDE_FROM_ALL)
+  endif()
+
+  target_include_directories(glog PUBLIC
+    $<BUILD_INTERFACE:${SAPI_GFLAGS_BINARY_DIR}/include>
+    $<BUILD_INTERFACE:${SAPI_GLOG_BINARY_DIR}>
+  )
+  add_library(gflags_nothreads STATIC IMPORTED)
+  set_target_properties(gflags_nothreads PROPERTIES
+    IMPORTED_LOCATION "${SAPI_GFLAGS_BINARY_DIR}/libgflags_nothreads.a")
+  target_link_libraries(glog PRIVATE
+    -Wl,--whole-archive
+    gflags_nothreads
+    -Wl,--no-whole-archive
+  )
+  add_dependencies(glog gflags::gflags)
+
+  if(_sapi_saved_BUILD_TESTING)
+    set(BUILD_TESTING "${_sapi_saved_BUILD_TESTING}")
+  endif()
 endif()
 
-set(_sapi_saved_BUILD_TESTING ${BUILD_TESTING})
-
-# Force gflags from subdirectory
-set(WITH_GFLAGS FALSE CACHE BOOL "" FORCE)
-set(HAVE_LIB_GFLAGS TRUE CACHE STRING "" FORCE)
-
-set(WITH_UNWIND FALSE CACHE BOOL "" FORCE)
-set(UNWIND_LIBRARY FALSE)
-set(HAVE_PWD_H FALSE)
-
-set(WITH_PKGCONFIG TRUE CACHE BOOL "" FORCE)
-
-set(BUILD_TESTING FALSE)
-set(BUILD_SHARED_LIBS ${SAPI_ENABLE_SHARED_LIBS})
-
-add_subdirectory("${SAPI_GLOG_SOURCE_DIR}"
-                 "${SAPI_GLOG_BINARY_DIR}" EXCLUDE_FROM_ALL)
-
-target_include_directories(glog PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/_deps/gflags-build/include>
-  $<BUILD_INTERFACE:${SAPI_GLOG_BINARY_DIR}>
-)
-add_library(gflags_nothreads STATIC IMPORTED)
-set_target_properties(gflags_nothreads PROPERTIES
-  IMPORTED_LOCATION
-  "${CMAKE_BINARY_DIR}/_deps/gflags-build/libgflags_nothreads.a")
-target_link_libraries(glog PRIVATE
-  -Wl,--whole-archive
-  gflags_nothreads
-  -Wl,--no-whole-archive
-)
-
-if(_sapi_saved_BUILD_TESTING)
-  set(BUILD_TESTING "${_sapi_saved_BUILD_TESTING}")
-endif()
+sapi_check_target(glog::glog)

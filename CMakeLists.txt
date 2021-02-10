@@ -47,9 +47,9 @@ endif()
 # Sapi CMake modules, order matters
 list(APPEND CMAKE_MODULE_PATH "${SAPI_SOURCE_DIR}/cmake"
                               "${SAPI_SOURCE_DIR}/cmake/modules")
+include(SapiUtil)
 include(SapiOptions)
 include(SapiDeps)
-include(SapiUtil)
 include(SapiBuildDefs)
 include(GNUInstallDirs)
 

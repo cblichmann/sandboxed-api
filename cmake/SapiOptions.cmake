@@ -12,34 +12,78 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# These options determine whether CMake should download the libraries that
+# This option should be only enabled for embedded and resource-constrained
+# environments
+option(SAPI_ENABLE_SHARED_LIBS
+       "Build SAPI shared libs (implies 'package' providers)" OFF)
+
+# The options below determine whether CMake should download the libraries that
 # Sandboxed API depends on at configure time.
 # The CMake script SapiDeps.cmake checks for the presence of certain build
-# targets to determine whether a library can be used. Disabling the options
+# targets to determine whether a library can be used. Setting the options
 # below enables embedding projects to selectively override/replace these
 # dependencies. This is useful for cases where embedding projects already
-# depend on some of these libraries (e.g. Abseil).
-option(SAPI_DOWNLOAD_ABSL "Download Abseil at config time" ON)
-option(SAPI_DOWNLOAD_GOOGLETEST "Download googletest at config time" ON)
-option(SAPI_DOWNLOAD_BENCHMARK "Download benchmark at config time" ON)
-option(SAPI_DOWNLOAD_GFLAGS "Download gflags at config time" ON)
-option(SAPI_DOWNLOAD_GLOG "Download glog at config time" ON)
-option(SAPI_DOWNLOAD_PROTOBUF "Download protobuf at config time" ON)
-option(SAPI_DOWNLOAD_LIBUNWIND "Download libunwind at config time" ON)
-option(SAPI_DOWNLOAD_LIBCAP "Download libcap at config time" ON)
-option(SAPI_DOWNLOAD_LIBFFI "Download libffi at config time" ON)
+# depend on some of these libraries (e.g. Abseil, Googletest).
+
+# Providers for third-party dependencies (SAPI_*_PROVIDER properties):
+# - "fetch": Build the dependency using sources from FetchContent()
+#   To to selectively override package sources, set FETCHCONTENT_SOURCE_DIR_*
+#   on the command-line. Use set FETCHCONTENT_FULLY_DISCONNECTED=ON to perform
+#   offline builds.
+# - "superbuild": Build the dependency using sources from ExternalProject_add()
+# - "package": Use CMake's find_package() functionality to locate a
+#   pre-installed dependency
+if(SAPI_ENABLE_SHARED_LIBS)
+  set(_sapi_default_provider "package")
+elseif(SAPI_HAVE_FETCHCONTENT)
+  set(_sapi_default_provider "fetch")
+else() # Use ExternalProject_Add() instead
+  set(_sapi_default_provider "superbuild")
+endif()
+
+set(SAPI_ABSL_PROVIDER "${_sapi_default_provider}" CACHE
+    STRING "Provider of absl library")
+set(SAPI_GOOGLETEST_PROVIDER "${_sapi_default_provider}" CACHE
+    STRING "Provider of googletest library")
+set(SAPI_BENCHMARK_PROVIDER "${_sapi_default_provider}" CACHE
+    STRING "Provider of benchmark library")
+set(SAPI_GFLAGS_PROVIDER "${_sapi_default_provider}" CACHE
+    STRING "Provider of gflags library")
+set(SAPI_GLOG_PROVIDER "${_sapi_default_provider}" CACHE
+    STRING "Provider of glog library")
+set(SAPI_PROTOBUF_PROVIDER "${_sapi_default_provider}" CACHE
+    STRING "Provider of protobuf library")
+set(SAPI_LIBUNWIND_PROVIDER "${_sapi_default_provider}" CACHE
+    STRING "Provider of libunwind library")
+set(SAPI_LIBCAP_PROVIDER "${_sapi_default_provider}" CACHE
+    STRING "Provider of libcap library")
+set(SAPI_LIBFFI_PROVIDER "${_sapi_default_provider}" CACHE
+    STRING "Provider of libffi library")
+set(SAPI_ZLIB_PROVIDER "${_sapi_default_provider}" CACHE
+    STRING "Provider of zlib library (used with SAPI_ENABLE_EXAMPLES)")
 
 # Options for building examples
 option(SAPI_ENABLE_EXAMPLES "Build example code" ON)
-option(SAPI_DOWNLOAD_ZLIB "Download zlib at config time (only if SAPI_ENABLE_EXAMPLES is set)" ON)
 
 option(SAPI_ENABLE_TESTS "Build unit tests" ON)
 option(SAPI_ENABLE_GENERATOR "Build Clang based code generator from source" OFF)
 
-# This flag should be only enabled for embedded and resource-constrained
-# environments
-option(SAPI_ENABLE_SHARED_LIBS "Build SAPI shared libs" OFF)
-
 option(SAPI_HARDENED_SOURCE "Build with hardening compiler options" OFF)
 
 option(SAPI_FORCE_COLOR_OUTPUT "Force colored compiler diagnostics when using Ninja" ON)
+
+# Set choices for the providers. These are displayed in the CMake GUI.
+foreach(_sapi_lib IN ITEMS ABSL
+                           BENCHMARK
+                           GFLAGS
+                           GLOG
+                           GOOGLETEST
+                           LIBCAP
+                           LIBFFI
+                           LIBUNWIND
+                           PROTOBUF
+                           ZLIB)
+  set_property(CACHE SAPI_${_sapi_lib}_PROVIDER PROPERTY
+               STRINGS "fetch" "superbuild" "package")
+endforeach()
+
