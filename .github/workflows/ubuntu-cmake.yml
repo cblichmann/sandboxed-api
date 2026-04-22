@@ -38,17 +38,14 @@ jobs:
     continue-on-error: ${{ matrix.ignore-errors }}
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v6
 
     - name: Cache dependencies
-      uses: actions/cache@v3
+      uses: actions/cache@v5
       with:
         key: ${{matrix.os}}-${{matrix.compiler}}${{matrix.compiler-version}}
         path: |
           ${{github.workspace}}/build/_deps
-
-    - name: Install ninja-build tool
-      uses: turtlesec-no/get-ninja@1.1.0
 
     - name: Install/configure Clang compiler toolchain
       if: matrix.compiler == 'clang'
@@ -58,8 +55,10 @@ jobs:
           libclang-${{matrix.libclang-version}}-dev \
           libclang-rt-${{matrix.libclang-version}}-dev \
           llvm-${{matrix.libclang-version}}-dev
-        echo "CXX=clang++-${{matrix.compiler-version}}" >> $GITHUB_ENV
-        echo "CC=clang-${{matrix.compiler-version}}" >> $GITHUB_ENV
+        sudo update-alternatives --install /usr/bin/cc cc \
+          /usr/bin/clang-${{matrix.compiler-version}} 100
+        sudo update-alternatives --install /usr/bin/c++ c++ \
+          /usr/bin/clang++-${{matrix.compiler-version}} 100
 
     - name: Install/configure GCC compiler toolchain
       if: matrix.compiler == 'gcc'
@@ -71,11 +70,6 @@ jobs:
           llvm-${{matrix.libclang-version}}-dev
         echo "CXX=g++-${{matrix.compiler-version}}" >> $GITHUB_ENV
         echo "CC=gcc-${{matrix.compiler-version}}" >> $GITHUB_ENV
-
-    - name: Create Build Environment
-      run: |
-        pip3 install absl-py
-        mkdir -p "$GITHUB_WORKSPACE/build"
 
     - name: Configure CMake
       run: |

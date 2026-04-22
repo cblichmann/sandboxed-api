@@ -52,17 +52,19 @@ endif()
 
 include(CheckCXXCompilerFlag)
 
+# Always select the highed version of an installed package
+set(CMAKE_FIND_PACKAGE_SORT_ORDER NATURAL)
+set(CMAKE_FIND_PACKAGE_SORT_DIRECTION DEC)
+
 # Allow the header generator to auto-configure include paths. Need to set a
 # cache variable, so that sub- and super-projects also have this enabled.
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "")
 
 set(CMAKE_SKIP_BUILD_RPATH ON)
 
-if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.14)
-  include(CheckPIESupported)
-  check_pie_supported()
-  set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-endif()
+include(CheckPIESupported)
+check_pie_supported()
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 # SAPI CMake modules, order matters
 list(APPEND CMAKE_MODULE_PATH "${SAPI_SOURCE_DIR}/cmake"

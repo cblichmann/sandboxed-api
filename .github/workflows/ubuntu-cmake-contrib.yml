@@ -23,19 +23,19 @@ jobs:
         ignore-errors: [true]
         include:
           - compiler: clang
-            compiler-version: 14
-            libclang-version: 18
+            compiler-version: 19
+            libclang-version: 19
           - compiler: gcc
-            compiler-version: 10
-            libclang-version: 18
+            compiler-version: 14
+            libclang-version: 19
     runs-on: ${{ matrix.os }}
     continue-on-error: ${{ matrix.ignore-errors }}
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v6
 
     - name: Cache dependencies
-      uses: actions/cache@v3
+      uses: actions/cache@v5
       with:
         key: ${{matrix.os}}-${{matrix.compiler}}${{matrix.compiler-version}}
         path: |
@@ -43,7 +43,7 @@ jobs:
           !${{github.workspace}}/build/_deps/${{matrix.contrib}}-*/**
 
     - name: Cache dependencies (contrib)
-      uses: actions/cache@v3
+      uses: actions/cache@v5
       with:
         key: ${{matrix.os}}-${{matrix.compiler}}${{matrix.compiler-version}}-${{matrix.contrib}}
         path: |
@@ -57,8 +57,9 @@ jobs:
       run: |
         sudo apt-get install -qy \
           clang-${{matrix.compiler-version}} \
-          libclang1-${{matrix.libclang-version}} \
-          python3-clang-${{matrix.libclang-version}}
+          libclang-${{matrix.libclang-version}}-dev \
+          libclang-rt-${{matrix.libclang-version}}-dev \
+          llvm-${{matrix.libclang-version}}-dev
         echo "CXX=clang++-${{matrix.compiler-version}}" >> $GITHUB_ENV
         echo "CC=clang-${{matrix.compiler-version}}" >> $GITHUB_ENV
 
@@ -67,8 +68,9 @@ jobs:
       run: |
         sudo apt-get install -qy \
           g++-${{matrix.compiler-version}} \
-          libclang1-${{matrix.libclang-version}} \
-          python3-clang-${{matrix.libclang-version}}
+          libclang-${{matrix.libclang-version}}-dev \
+          libclang-rt-${{matrix.libclang-version}}-dev \
+          llvm-${{matrix.libclang-version}}-dev
         echo "CXX=g++-${{matrix.compiler-version}}" >> $GITHUB_ENV
         echo "CC=gcc-${{matrix.compiler-version}}" >> $GITHUB_ENV
 
@@ -81,11 +83,6 @@ jobs:
       if: matrix.contrib == 'libxls'
       run: |
         sudo apt-get install -qy autoconf-archive gettext
-
-    - name: Create Build Environment
-      run: |
-        pip3 install absl-py
-        cmake -E make_directory $GITHUB_WORKSPACE/build
 
     - name: Configure CMake
       run: |
