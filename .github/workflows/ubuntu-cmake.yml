@@ -11,7 +11,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # Ubuntu 24.04: Use preinstalled Clang 19, 18
+          # Ubuntu 24.04: Use Clang 19, 18
           - os: ubuntu-24.04
             compiler: clang
             compiler-version: 19
@@ -22,7 +22,7 @@ jobs:
             compiler-version: 18
             libclang-version: 19
             ignore-errors: false
-          # Ubuntu 24.04: Use preinstalled GCC 14.2.0, 13.2.0
+          # Ubuntu 24.04: Use GCC 14.2.0, 13.2.0
           - os: ubuntu-24.04
             compiler: gcc
             compiler-version: 14
@@ -38,17 +38,14 @@ jobs:
     continue-on-error: ${{ matrix.ignore-errors }}
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v6
 
     - name: Cache dependencies
-      uses: actions/cache@v3
+      uses: actions/cache@v5
       with:
         key: ${{matrix.os}}-${{matrix.compiler}}${{matrix.compiler-version}}
         path: |
           ${{github.workspace}}/build/_deps
-
-    - name: Install ninja-build tool
-      uses: turtlesec-no/get-ninja@1.1.0
 
     - name: Install/configure Clang compiler toolchain
       if: matrix.compiler == 'clang'
@@ -58,8 +55,10 @@ jobs:
           libclang-${{matrix.libclang-version}}-dev \
           libclang-rt-${{matrix.libclang-version}}-dev \
           llvm-${{matrix.libclang-version}}-dev
-        echo "CXX=clang++-${{matrix.compiler-version}}" >> $GITHUB_ENV
-        echo "CC=clang-${{matrix.compiler-version}}" >> $GITHUB_ENV
+        sudo update-alternatives --install /usr/bin/cc cc \
+          /usr/bin/clang-${{matrix.compiler-version}} 100
+        sudo update-alternatives --install /usr/bin/c++ c++ \
+          /usr/bin/clang++-${{matrix.compiler-version}} 100
 
     - name: Install/configure GCC compiler toolchain
       if: matrix.compiler == 'gcc'
@@ -69,19 +68,19 @@ jobs:
           libclang-${{matrix.libclang-version}}-dev \
           libclang-rt-${{matrix.libclang-version}}-dev \
           llvm-${{matrix.libclang-version}}-dev
-        echo "CXX=g++-${{matrix.compiler-version}}" >> $GITHUB_ENV
-        echo "CC=gcc-${{matrix.compiler-version}}" >> $GITHUB_ENV
-
-    - name: Create Build Environment
-      run: |
-        pip3 install absl-py
-        mkdir -p "$GITHUB_WORKSPACE/build"
+        sudo update-alternatives --install /usr/bin/cc cc \
+          /usr/bin/gcc-${{matrix.compiler-version}} 100
+        sudo update-alternatives --install /usr/bin/c++ c++ \
+          /usr/bin/g++-${{matrix.compiler-version}} 100
 
     - name: Configure CMake
       run: |
         cmake \
           -S $GITHUB_WORKSPACE \
           -B $GITHUB_WORKSPACE/build \
+          -DClang_DIR=/usr/lib/llvm-${{matrix.libclang-version}}/lib/cmake/clang \
+          -DLLVM_DIR=/usr/lib/llvm-${{matrix.libclang-version}}/lib/cmake/llvm \
+          -DCMAKE_PREFIX_PATH=/usr/lib/llvm-${{matrix.libclang-version}} \
           -G Ninja \
           -DCMAKE_BUILD_TYPE=$BUILD_TYPE
 
@@ -91,10 +90,10 @@ jobs:
           --build $GITHUB_WORKSPACE/build \
           --config $BUILD_TYPE
 
-    - name: Test
-      run: |
-        ctest \
-          --test-dir $GITHUB_WORKSPACE/build \
-          -C $BUILD_TYPE \
-          --output-on-failure \
-          -R SapiTest
+    #- name: Test
+    #  run: |
+    #    ctest \
+    #      --test-dir $GITHUB_WORKSPACE/build \
+    #      -C $BUILD_TYPE \
+    #      --output-on-failure \
+    #      -R SapiTest

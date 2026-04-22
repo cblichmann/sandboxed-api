@@ -54,6 +54,10 @@ endif()
 
 include(CheckCXXCompilerFlag)
 
+# Always select the highed version of an installed package
+set(CMAKE_FIND_PACKAGE_SORT_ORDER NATURAL)
+set(CMAKE_FIND_PACKAGE_SORT_DIRECTION DEC)
+
 # Allow the header generator to auto-configure include paths. Need to set a
 # cache variable, so that sub- and super-projects also have this enabled.
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "")
